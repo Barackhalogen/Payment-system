@@ -8,7 +8,7 @@ import {
 } from "@autumn/shared";
 import { AttachBody } from "@autumn/shared";
 import { isFreeProduct } from "@/internal/products/productUtils.js";
-import { nullish } from "@/utils/genUtils.js";
+import { nullish, notNullish } from "@/utils/genUtils.js";
 import { ProrationBehavior } from "@autumn/shared";
 import { attachParamsToProduct } from "./convertAttachParams.js";
 import { attachParamToCusProducts } from "./convertAttachParams.js";
@@ -135,6 +135,10 @@ export const getAttachConfig = async ({
     branch == AttachBranch.Downgrade ||
     attachBody.free_trial === false;
 
+  let freeTrialWithoutCardRequired =
+    notNullish(attachParams.freeTrial) &&
+    attachParams.freeTrial?.card_required === false;
+
   let carryTrial = branch === AttachBranch.NewVersion;
 
   let sameIntervals = intervalsAreSame({ attachParams });
@@ -146,7 +150,7 @@ export const getAttachConfig = async ({
   const checkoutFlow =
     isPublic || forceCheckout || (noPaymentMethod && !invoiceOnly);
 
-  const onlyCheckout = !isFree && checkoutFlow;
+  const onlyCheckout = !isFree && checkoutFlow && !freeTrialWithoutCardRequired;
 
   let config: AttachConfig = {
     branch,
