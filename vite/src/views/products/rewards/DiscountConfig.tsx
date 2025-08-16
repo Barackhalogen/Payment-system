@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { isFeatureItem } from "@/utils/product/getItemType";
 import { formatProductItemText } from "@/utils/product/product-item/formatProductItem";
+import { invalidNumber } from "@/utils/genUtils";
 
 export const DiscountConfig = ({
   reward,
@@ -54,10 +55,18 @@ export const DiscountConfig = ({
         <div className="w-6/12">
           <FieldLabel>Amount</FieldLabel>
           <Input
-            value={config.discount_value}
-            onChange={(e) =>
-              setConfig("discount_value", Number(e.target.value))
-            }
+            value={config.discount_value || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "") {
+                setConfig("discount_value", 0);
+              } else if (!invalidNumber(value)) {
+                setConfig("discount_value", Number(value));
+              }
+            }}
+            type="number"
+            step="any"
+            placeholder="0"
             endContent={
               <p className="text-t3">
                 {reward.type === RewardType.PercentageDiscount
@@ -73,11 +82,17 @@ export const DiscountConfig = ({
             {config.duration_type === CouponDurationType.Months && (
               <Input
                 className="w-[60px] no-spinner"
-                value={config.duration_value}
+                value={config.duration_value || ""}
                 onChange={(e) => {
-                  setConfig("duration_value", Number(e.target.value));
+                  const value = e.target.value;
+                  if (value === "") {
+                    setConfig("duration_value", 0);
+                  } else if (!invalidNumber(value)) {
+                    setConfig("duration_value", Number(value));
+                  }
                 }}
                 type="number"
+                placeholder="0"
               />
             )}
             <Select
